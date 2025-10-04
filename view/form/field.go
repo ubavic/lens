@@ -1,10 +1,9 @@
 package form
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/ubavic/lens/view/tooltip"
+	"maragu.dev/gomponents"
+	ghtml "maragu.dev/gomponents/html"
 )
 
 type FieldType uint
@@ -26,107 +25,117 @@ type Field struct {
 	Name        string
 	Description string
 	Value       string
-	Editable    bool
+	ReadOnly    bool
 	Required    bool
 	Changeable  bool
 	Error       string
+
+	MinValue *string
+	MaxValue *string
 }
 
-func (f *Field) Render(sb *strings.Builder) error {
-	_, err := sb.WriteString(`<div class="field">`)
-	if err != nil {
-		return fmt.Errorf("writing field start: %w", err)
-	}
+func (f *Field) Node() gomponents.Node {
 
-	requiredString := ""
-	if f.Required {
-		requiredString = `<span class="required">&lowast;</span>`
-	}
-
-	tooltipString := ""
-	if f.Description != "" {
-		tooltipString = tooltip.Render(f.Description)
-	}
-
-	labelString := fmt.Sprintf(`<div class="labelRow"><label>%s</label>%s</div>%s`, f.Name, requiredString, tooltipString)
-	_, err = sb.WriteString(labelString)
-	if err != nil {
-		return fmt.Errorf("writing field label: %w", err)
-	}
-
+	var entry gomponents.Node
 	switch f.Type {
 	case FieldText:
-		err = f.renderTextInput(sb)
+		entry = f.renderTextInput()
 	case FieldInteger:
-		err = f.renderIntegerInput(sb)
+		entry = f.renderIntegerInput()
 	case FieldDecimal:
-		err = f.renderDecimalInput(sb)
-	}
-	if err != nil {
-		return fmt.Errorf("writing field input: %w", err)
-	}
-
-	if f.Error != "" {
-		errorString := fmt.Sprintf(`<div class="error-message">%s</div>`, f.Error)
-		_, err = sb.WriteString(errorString)
-		if err != nil {
-			return fmt.Errorf("writing field error: %w", err)
-		}
-	}
-
-	_, err = sb.WriteString(`</div>`)
-	if err != nil {
-		return fmt.Errorf("writing field input end: %w", err)
+		entry = f.renderDecimalInput()
+	case FieldSelection:
+		entry = f.renderDecimalInput()
+	case FieldDate:
+		entry = f.renderDateInput()
+	case FieldTime:
+		entry = f.renderDecimalInput()
+	case FieldDateTime:
+		entry = f.renderDateTimeInput()
+	case FieldBoolean:
+		entry = f.renderBooleanInput()
 	}
 
-	return nil
+	return ghtml.Div(
+		ghtml.Class("field"),
+
+		ghtml.Div(
+			ghtml.Class("labelRow"),
+			ghtml.Label(gomponents.Text(f.Name)),
+			gomponents.If(f.Required, ghtml.Span(ghtml.Class("required"), gomponents.Raw("&lowast;"))),
+			gomponents.If(f.Description != "", gomponents.Raw(tooltip.Render(f.Description))),
+		),
+		entry,
+		gomponents.If(f.Error != "",
+			ghtml.Div(ghtml.Class("error-message"), gomponents.Text(f.Error)),
+		),
+	)
 }
 
-func (f *Field) renderTextInput(sb *strings.Builder) error {
-
-	classes := []string{}
-	if f.Error != "" {
-		classes = append(classes, "error")
-	}
-
-	inputString := fmt.Sprintf(`<input type="text" name="%s" value="%s" class="%s">`, f.Name, f.Value, strings.Join(classes, " "))
-
-	_, err := sb.WriteString(inputString)
-	if err != nil {
-		return fmt.Errorf("writing field input: %w", err)
-	}
-
-	return nil
+func (f *Field) renderTextInput() gomponents.Node {
+	return ghtml.Input(
+		gomponents.Attr("type", "text"),
+		gomponents.Attr("name", f.ID),
+		ghtml.Value(f.Value),
+		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
+		gomponents.If(f.Error != "", ghtml.Class("error")),
+	)
 }
 
-func (f *Field) renderIntegerInput(sb *strings.Builder) error {
-	classes := []string{}
-	if f.Error != "" {
-		classes = append(classes, "error")
-	}
-
-	inputString := fmt.Sprintf(`<input type="number" name="%s" value="%s" class="%s">`, f.Name, f.Value, strings.Join(classes, " "))
-
-	_, err := sb.WriteString(inputString)
-	if err != nil {
-		return fmt.Errorf("writing field input: %w", err)
-	}
-
-	return nil
+func (f *Field) renderIntegerInput() gomponents.Node {
+	return ghtml.Input(
+		gomponents.Attr("type", "number"),
+		gomponents.Attr("name", f.ID),
+		ghtml.Value(f.Value),
+		// gomponents.If(f.MinValue != nil, gomponents.Attr("min", *f.MinValue)),
+		// gomponents.If(f.MaxValue != nil, gomponents.Attr("max", *f.MaxValue)),
+		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
+		gomponents.If(f.Error != "", ghtml.Class("error")),
+	)
 }
 
-func (f *Field) renderDecimalInput(sb *strings.Builder) error {
-	classes := []string{}
-	if f.Error != "" {
-		classes = append(classes, "error")
-	}
+func (f *Field) renderDecimalInput() gomponents.Node {
+	return ghtml.Input(
+		gomponents.Attr("type", "number"),
+		gomponents.Attr("name", f.ID),
+		ghtml.Value(f.Value),
+		// gomponents.If(f.MinValue != nil, gomponents.Attr("min", *f.MinValue)),
+		// gomponents.If(f.MaxValue != nil, gomponents.Attr("max", *f.MaxValue)),
+		gomponents.If(!f.ReadOnly, gomponents.Attr("readonly")),
+		gomponents.If(f.Error != "", ghtml.Class("error")),
+	)
+}
 
-	inputString := fmt.Sprintf(`<input type="number" name="%s" value="%s" class="%s">`, f.Name, f.Value, strings.Join(classes, " "))
+func (f *Field) renderBooleanInput() gomponents.Node {
+	return ghtml.Input(
+		gomponents.Attr("type", "checkbox"),
+		gomponents.Attr("name", f.ID),
+		ghtml.Value(f.Value),
+		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
+		gomponents.If(f.Error != "", ghtml.Class("error")),
+	)
+}
 
-	_, err := sb.WriteString(inputString)
-	if err != nil {
-		return fmt.Errorf("writing field input: %w", err)
-	}
+func (f *Field) renderDateInput() gomponents.Node {
+	return ghtml.Input(
+		gomponents.Attr("type", "date"),
+		gomponents.Attr("name", f.ID),
+		ghtml.Value(f.Value),
+		//gomponents.If(f.MinValue != nil, gomponents.Attr("min", *f.MinValue)),
+		//gomponents.If(f.MaxValue != nil, gomponents.Attr("max", *f.MaxValue)),
+		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
+		gomponents.If(f.Error != "", ghtml.Class("error")),
+	)
+}
 
-	return nil
+func (f *Field) renderDateTimeInput() gomponents.Node {
+	return ghtml.Input(
+		gomponents.Attr("type", "datetime-local"),
+		gomponents.Attr("name", f.ID),
+		ghtml.Value(f.Value),
+		// gomponents.If(f.MinValue != nil, gomponents.Attr("min", *f.MinValue)),
+		// gomponents.If(f.MaxValue != nil, gomponents.Attr("max", *f.MaxValue)),
+		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
+		gomponents.If(f.Error != "", ghtml.Class("error")),
+	)
 }
