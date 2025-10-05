@@ -1,16 +1,28 @@
 package server
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+
+	"github.com/ubavic/lens/view"
 )
 
-func StartServer(port string) error {
+type ServerConfig struct {
+	Port  string
+	Pages []view.Page
+}
+
+func StartServer(config ServerConfig) error {
 	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-	http.HandleFunc("/", homeHandler)
+	http.Handle("GET /static/", http.StripPrefix("/static/", fs))
 
-	fmt.Printf("Server listening on port http://localhost:%s...\n", port)
+	for _, p := range config.Pages {
+		p.ResolveIds()
+		http.HandleFunc("POST /"+p.Id+"/", postHandler(p))
+		http.HandleFunc("/"+p.Id+"/", pageHandler(p))
+	}
 
-	return http.ListenAndServe(":"+port, nil)
+	log.Printf("Server listening on port http://localhost:%s...\n", config.Port)
+
+	return http.ListenAndServe(":"+config.Port, nil)
 }

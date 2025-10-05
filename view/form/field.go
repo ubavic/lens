@@ -139,3 +139,7 @@ func (f *Field) renderDateTimeInput() gomponents.Node {
 		gomponents.If(f.Error != "", ghtml.Class("error")),
 	)
 }
+
+func (f *Field) ResolveIds(id string) {
+	f.ID = id
+}

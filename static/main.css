@@ -1,11 +1,11 @@
 html {
+  background-color: #fafafa;
   font-family: "Roboto", sans-serif;
   font-optical-sizing: auto;
 }
 
 main {
   border-radius: 3px;
-  background-color: white;
   max-width: 70rem;
   padding: 1rem;
   margin: 0 auto;
@@ -51,7 +51,7 @@ form {
     user-select: none;
   }
 
-  input .error {
+  input.error {
     border: 1px solid red;
   }
 
@@ -121,4 +121,23 @@ lens-tooltip {
 :has(> lens-tooltip):is(:hover, :focus-visible, :active) > lens-tooltip {
   opacity: 1;
   transition-delay: 500ms;
+}
+
+
+table {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+thead td {
+  background-color: #c8dccf;
+  font-weight: 500;
+}
+
+td {
+  padding: 0.2em;
+}
+
+tbody tr:hover {
+  background-color: #f0f0f0;
 }
