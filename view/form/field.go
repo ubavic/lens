@@ -87,8 +87,8 @@ func (f *Field) renderIntegerInput() gomponents.Node {
 		gomponents.Attr("type", "number"),
 		gomponents.Attr("name", f.ID),
 		ghtml.Value(f.Value),
-		// gomponents.If(f.MinValue != nil, gomponents.Attr("min", *f.MinValue)),
-		// gomponents.If(f.MaxValue != nil, gomponents.Attr("max", *f.MaxValue)),
+		gomponents.Iff(f.MinValue != nil, func() gomponents.Node { return gomponents.Attr("min", *f.MinValue) }),
+		gomponents.Iff(f.MaxValue != nil, func() gomponents.Node { return gomponents.Attr("max", *f.MaxValue) }),
 		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
 		gomponents.If(f.Error != "", ghtml.Class("error")),
 	)
@@ -99,8 +99,8 @@ func (f *Field) renderDecimalInput() gomponents.Node {
 		gomponents.Attr("type", "number"),
 		gomponents.Attr("name", f.ID),
 		ghtml.Value(f.Value),
-		// gomponents.If(f.MinValue != nil, gomponents.Attr("min", *f.MinValue)),
-		// gomponents.If(f.MaxValue != nil, gomponents.Attr("max", *f.MaxValue)),
+		gomponents.Iff(f.MinValue != nil, func() gomponents.Node { return gomponents.Attr("min", *f.MinValue) }),
+		gomponents.Iff(f.MaxValue != nil, func() gomponents.Node { return gomponents.Attr("max", *f.MaxValue) }),
 		gomponents.If(!f.ReadOnly, gomponents.Attr("readonly")),
 		gomponents.If(f.Error != "", ghtml.Class("error")),
 	)
@@ -121,8 +121,8 @@ func (f *Field) renderDateInput() gomponents.Node {
 		gomponents.Attr("type", "date"),
 		gomponents.Attr("name", f.ID),
 		ghtml.Value(f.Value),
-		//gomponents.If(f.MinValue != nil, gomponents.Attr("min", *f.MinValue)),
-		//gomponents.If(f.MaxValue != nil, gomponents.Attr("max", *f.MaxValue)),
+		gomponents.Iff(f.MinValue != nil, func() gomponents.Node { return gomponents.Attr("min", *f.MinValue) }),
+		gomponents.Iff(f.MaxValue != nil, func() gomponents.Node { return gomponents.Attr("max", *f.MaxValue) }),
 		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
 		gomponents.If(f.Error != "", ghtml.Class("error")),
 	)
@@ -133,8 +133,8 @@ func (f *Field) renderDateTimeInput() gomponents.Node {
 		gomponents.Attr("type", "datetime-local"),
 		gomponents.Attr("name", f.ID),
 		ghtml.Value(f.Value),
-		// gomponents.If(f.MinValue != nil, gomponents.Attr("min", *f.MinValue)),
-		// gomponents.If(f.MaxValue != nil, gomponents.Attr("max", *f.MaxValue)),
+		gomponents.Iff(f.MinValue != nil, func() gomponents.Node { return gomponents.Attr("min", *f.MinValue) }),
+		gomponents.Iff(f.MaxValue != nil, func() gomponents.Node { return gomponents.Attr("max", *f.MaxValue) }),
 		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
 		gomponents.If(f.Error != "", ghtml.Class("error")),
 	)
