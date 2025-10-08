@@ -1,15 +1,23 @@
-html {
+body {
   background-color: #fafafa;
   font-family: "Roboto", sans-serif;
   font-optical-sizing: auto;
+  margin: 0;
 }
 
 main {
   border-radius: 3px;
-  max-width: 70rem;
+  max-width: 90rem;
   padding: 1rem;
   margin: 0 auto;
+
+  >header {
+    font-weight: 800;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
 }
+
 
 form {
   display: flex;
@@ -67,15 +75,6 @@ form {
 }
 
 
-lens-column {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-
-  heading {
-    font-weight: 400;
-  }
-}
 
 lens-tooltip {
   --_triangle-size: 7px;
@@ -123,7 +122,6 @@ lens-tooltip {
   transition-delay: 500ms;
 }
 
-
 table {
   border-collapse: collapse;
   min-width: 100%;
@@ -140,4 +138,62 @@ td {
 
 tbody tr:hover {
   background-color: #f0f0f0;
+}
+
+lens-group {
+  display: block;
+  margin-top: 2rem;
+  box-sizing: border-box;
+
+  > header {
+    font-weight: 500;
+    font-size: larger;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+
+    >* {
+      flex-grow: 1;
+    }
+  }
+}
+
+lens-column {
+  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  header {
+    font-weight: 500;
+  }
+}
+
+
+lens-main-navigation {
+  display: flex;
+  flex-direction: column;
+  border-right: 0.5px solid #ccc;
+  background-color: #fafafa;
+  width: 20rem;
+  height: 100vh;
+  padding: 0.5rem;
+  position: fixed;
+
+  a {
+    display: block;
+    padding: 0.2rem;
+    border-radius: 3px;
+    text-decoration: none;
+    font-weight: 500;
+    color: #1c703a;
+
+    &:hover{
+      text-decoration: underline;
+      background-color: #f0f0f0;
+    }
+  }
 }

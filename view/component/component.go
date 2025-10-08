@@ -1,4 +1,4 @@
-package view
+package component
 
 import "maragu.dev/gomponents"
 
