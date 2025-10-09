@@ -1,6 +1,7 @@
 package form
 
 import (
+	"github.com/ubavic/lens/view/component"
 	"github.com/ubavic/lens/view/tooltip"
 	"maragu.dev/gomponents"
 	ghtml "maragu.dev/gomponents/html"
@@ -20,7 +21,7 @@ const (
 )
 
 type Field struct {
-	ID          string
+	uid         component.Uid
 	Type        FieldType
 	Name        string
 	Description string
@@ -29,6 +30,7 @@ type Field struct {
 	Required    bool
 	Changeable  bool
 	Error       string
+	Validate    func(string) error
 
 	MinValue *string
 	MaxValue *string
@@ -57,8 +59,8 @@ func (f *Field) Node() gomponents.Node {
 	}
 
 	return ghtml.Div(
+		gomponents.Attr("id", f.uid),
 		ghtml.Class("field"),
-
 		ghtml.Div(
 			ghtml.Class("labelRow"),
 			ghtml.Label(gomponents.Text(f.Name)),
@@ -75,7 +77,9 @@ func (f *Field) Node() gomponents.Node {
 func (f *Field) renderTextInput() gomponents.Node {
 	return ghtml.Input(
 		gomponents.Attr("type", "text"),
-		gomponents.Attr("name", f.ID),
+		gomponents.Attr("lens-target-id", f.uid),
+		gomponents.Attr("onchange", "valueChanged(this)"),
+		gomponents.Attr("autocomplete", "off"),
 		ghtml.Value(f.Value),
 		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
 		gomponents.If(f.Error != "", ghtml.Class("error")),
@@ -85,7 +89,9 @@ func (f *Field) renderTextInput() gomponents.Node {
 func (f *Field) renderIntegerInput() gomponents.Node {
 	return ghtml.Input(
 		gomponents.Attr("type", "number"),
-		gomponents.Attr("name", f.ID),
+		gomponents.Attr("lens-target-id", f.uid),
+		gomponents.Attr("onchange", "valueChanged(this)"),
+		gomponents.Attr("autocomplete", "off"),
 		ghtml.Value(f.Value),
 		gomponents.Iff(f.MinValue != nil, func() gomponents.Node { return gomponents.Attr("min", *f.MinValue) }),
 		gomponents.Iff(f.MaxValue != nil, func() gomponents.Node { return gomponents.Attr("max", *f.MaxValue) }),
@@ -97,7 +103,9 @@ func (f *Field) renderIntegerInput() gomponents.Node {
 func (f *Field) renderDecimalInput() gomponents.Node {
 	return ghtml.Input(
 		gomponents.Attr("type", "number"),
-		gomponents.Attr("name", f.ID),
+		gomponents.Attr("lens-target-id", f.uid),
+		gomponents.Attr("onchange", "valueChanged(this)"),
+		gomponents.Attr("autocomplete", "off"),
 		ghtml.Value(f.Value),
 		gomponents.Iff(f.MinValue != nil, func() gomponents.Node { return gomponents.Attr("min", *f.MinValue) }),
 		gomponents.Iff(f.MaxValue != nil, func() gomponents.Node { return gomponents.Attr("max", *f.MaxValue) }),
@@ -109,7 +117,9 @@ func (f *Field) renderDecimalInput() gomponents.Node {
 func (f *Field) renderBooleanInput() gomponents.Node {
 	return ghtml.Input(
 		gomponents.Attr("type", "checkbox"),
-		gomponents.Attr("name", f.ID),
+		gomponents.Attr("lens-target-id", f.uid),
+		gomponents.Attr("onchange", "valueChanged(this)"),
+		gomponents.Attr("autocomplete", "off"),
 		ghtml.Value(f.Value),
 		gomponents.If(f.ReadOnly, gomponents.Attr("readonly")),
 		gomponents.If(f.Error != "", ghtml.Class("error")),
@@ -119,7 +129,9 @@ func (f *Field) renderBooleanInput() gomponents.Node {
 func (f *Field) renderDateInput() gomponents.Node {
 	return ghtml.Input(
 		gomponents.Attr("type", "date"),
-		gomponents.Attr("name", f.ID),
+		gomponents.Attr("lens-target-id", f.uid),
+		gomponents.Attr("onchange", "valueChanged(this)"),
+		gomponents.Attr("autocomplete", "off"),
 		ghtml.Value(f.Value),
 		gomponents.Iff(f.MinValue != nil, func() gomponents.Node { return gomponents.Attr("min", *f.MinValue) }),
 		gomponents.Iff(f.MaxValue != nil, func() gomponents.Node { return gomponents.Attr("max", *f.MaxValue) }),
@@ -131,7 +143,9 @@ func (f *Field) renderDateInput() gomponents.Node {
 func (f *Field) renderDateTimeInput() gomponents.Node {
 	return ghtml.Input(
 		gomponents.Attr("type", "datetime-local"),
-		gomponents.Attr("name", f.ID),
+		gomponents.Attr("lens-target-id", f.uid),
+		gomponents.Attr("onchange", "valueChanged(this)"),
+		gomponents.Attr("autocomplete", "off"),
 		ghtml.Value(f.Value),
 		gomponents.Iff(f.MinValue != nil, func() gomponents.Node { return gomponents.Attr("min", *f.MinValue) }),
 		gomponents.Iff(f.MaxValue != nil, func() gomponents.Node { return gomponents.Attr("max", *f.MaxValue) }),
@@ -140,6 +154,21 @@ func (f *Field) renderDateTimeInput() gomponents.Node {
 	)
 }
 
-func (f *Field) ResolveIds(id string) {
-	f.ID = id
+func (f *Field) Resolve(id component.Uid, hm component.HandlerMap) {
+	hm[id] = func(a component.Action) component.Component {
+		f.Error = ""
+
+		f.Value = a.Data
+
+		if f.Validate != nil {
+			e := f.Validate(f.Value)
+			if e != nil {
+				f.Error = e.Error()
+			}
+		}
+
+		return f
+	}
+
+	f.uid = id
 }

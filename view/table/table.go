@@ -3,12 +3,13 @@ package table
 import (
 	"strconv"
 
+	"github.com/ubavic/lens/view/component"
 	"maragu.dev/gomponents"
 	"maragu.dev/gomponents/html"
 )
 
 type Table struct {
-	uid         string
+	uid         component.Uid
 	Caption     string
 	HideCaption bool
 	HideHeader  bool
@@ -42,10 +43,10 @@ func (t *Table) Data() [][]string {
 	}
 }
 
-func (t *Table) ResolveIds(id string) {
+func (t *Table) Resolve(id component.Uid, hm component.HandlerMap) {
 	t.uid = id
 
 	for i, col := range t.Columns {
-		col.ResolveIds(id + "-" + strconv.Itoa(i))
+		col.Resolve(id+"-"+strconv.Itoa(i), hm)
 	}
 }

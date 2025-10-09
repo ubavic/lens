@@ -9,7 +9,7 @@ import (
 )
 
 type Column struct {
-	uid      string
+	uid      component.Uid
 	Name     string
 	HideName string
 	Span     uint
@@ -23,10 +23,10 @@ func (c *Column) Node() gomponents.Node {
 	)
 }
 
-func (c *Column) ResolveIds(id string) {
+func (c *Column) Resolve(id component.Uid, hm component.HandlerMap) {
 	c.uid = id
 
 	for i, fi := range c.Elements {
-		fi.ResolveIds(id + "-" + strconv.Itoa(i))
+		fi.Resolve(id+"-"+strconv.Itoa(i), hm)
 	}
 }

@@ -1,12 +1,13 @@
 package table
 
 import (
+	"github.com/ubavic/lens/view/component"
 	"maragu.dev/gomponents"
 	"maragu.dev/gomponents/html"
 )
 
 type Column struct {
-	uid         string
+	uid         component.Uid
 	Name        string
 	Description string
 	SortedBy    int8
@@ -21,6 +22,7 @@ func (tc *Column) Node() gomponents.Node {
 	)
 }
 
-func (tc *Column) ResolveIds(id string) {
+func (tc *Column) Resolve(id component.Uid, hm component.HandlerMap) {
 	tc.uid = id
+
 }

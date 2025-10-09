@@ -69,7 +69,7 @@ form {
   }
 
   input:read-only {
-    border-color: transparent;
+    background-color: #f0f0f0 !important;
     color: #666;
   }
 }
@@ -142,20 +142,21 @@ tbody tr:hover {
 
 lens-group {
   display: block;
-  margin-top: 2rem;
   box-sizing: border-box;
+  margin-top: 2rem;
 
-  > header {
-    font-weight: 500;
+  &>header {
+    font-weight: 600;
     font-size: larger;
+    margin-bottom: 0.5rem;
   }
 
-  > div {
+  &>div {
     display: flex;
     flex-direction: row;
     gap: 1rem;
 
-    >* {
+    >*{
       flex-grow: 1;
     }
   }
@@ -167,11 +168,10 @@ lens-column {
   flex-direction: column;
   gap: 0.3rem;
 
-  header {
-    font-weight: 500;
+  &>header {
+    font-weight: 600;
   }
 }
-
 
 lens-main-navigation {
   display: flex;

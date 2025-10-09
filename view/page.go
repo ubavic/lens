@@ -15,7 +15,7 @@ type Page struct {
 	Components []component.Component
 }
 
-func (p Page) Node() gomponents.Node {
+func (p Page) Node(sessionId string) gomponents.Node {
 	nav := navigation.Side{}
 
 	return html.Doctype(
@@ -26,9 +26,11 @@ func (p Page) Node() gomponents.Node {
 				html.TitleEl(gomponents.Text(p.Name)),
 				html.Link(gomponents.Attr("rel", "stylesheet"), gomponents.Attr("href", "/static/main.css")),
 				html.Style(`@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');`),
-				html.Script(gomponents.Attr("src", "/static/htmx.min.js")),
+				html.Script(gomponents.Attr("src", "/static/ws.js")),
 			),
-			html.Body(nav.Node(),
+			html.Body(
+				gomponents.Attr("lens-session-id", sessionId),
+				nav.Node(),
 				html.Main(
 					html.Header(gomponents.Text(p.Name)),
 					gomponents.Map(p.Components, func(f component.Component) gomponents.Node { return f.Node() }),
@@ -38,11 +40,11 @@ func (p Page) Node() gomponents.Node {
 }
 
 func (p Page) Post(resource string) gomponents.Node {
-	return p.Node()
+	return p.Node("")
 }
 
-func (p Page) ResolveIds() {
+func (p Page) Resolve(hm component.HandlerMap) {
 	for i, c := range p.Components {
-		c.ResolveIds(strconv.Itoa(i))
+		c.Resolve(component.Uid(strconv.Itoa(i)), hm)
 	}
 }

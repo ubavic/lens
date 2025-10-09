@@ -3,12 +3,13 @@ package layout
 import (
 	"strconv"
 
+	"github.com/ubavic/lens/view/component"
 	"maragu.dev/gomponents"
 	"maragu.dev/gomponents/html"
 )
 
 type Group struct {
-	uid         string
+	uid         component.Uid
 	Name        string
 	Description string
 	Collapsible bool
@@ -24,10 +25,10 @@ func (c *Group) Node() gomponents.Node {
 	)
 }
 
-func (c *Group) ResolveIds(id string) {
+func (c *Group) Resolve(id component.Uid, hm component.HandlerMap) {
 	c.uid = id
 
 	for i, fi := range c.Columns {
-		fi.ResolveIds(id + "-" + strconv.Itoa(i))
+		fi.Resolve(id+"-"+strconv.Itoa(i), hm)
 	}
 }

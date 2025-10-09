@@ -1,6 +1,7 @@
 package table
 
 import (
+	"github.com/ubavic/lens/view/component"
 	"maragu.dev/gomponents"
 	"maragu.dev/gomponents/html"
 )
@@ -15,6 +16,6 @@ func (t *Row) Node() gomponents.Node {
 	)
 }
 
-func (t *Row) ResolveIds(id string) {
+func (t *Row) Resolve(id component.Uid, hm component.HandlerMap) {
 	// TODO
 }
